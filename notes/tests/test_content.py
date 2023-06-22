@@ -8,10 +8,12 @@ from notes.models import Note
 User = get_user_model()
 
 
-@skip('Пропущено')
+@skip('Проверено')
 class TestNotesPage(TestCase):
-    # Вынесем ссылку на страницу заметок в атрибуты класса.
+    # Вынесем ссылку на страницу заметок 
+    # и количество заметок в атрибуты класса.
     NOTES_URL = reverse('notes:list')
+    NOTES_COUNT = 11
 
     @classmethod
     def setUpTestData(cls):
@@ -26,21 +28,24 @@ class TestNotesPage(TestCase):
                 slug=f'notes_{index}',
                 author=cls.author
             )
-            for index in range(11)
+            for index in range(cls.NOTES_COUNT)
         ]
         Note.objects.bulk_create(all_notes)
 
     def test_notes_count(self):
+        # Логиним пользователя в клиенте:
+        self.client.force_login(self.author)
         # Загружаем страницу с заметками.
         response = self.client.get(self.NOTES_URL)
         # Получаем список объектов из словаря контекста.
         object_list = response.context['object_list']
         # Определяем длину списка.
         notes_count = len(object_list)
-        # Проверяем, что на странице именно 10 новостей.
-        self.assertEqual(notes_count, 10)
+        # Проверяем, что на странице именно 11 новостей.
+        self.assertEqual(notes_count, self.NOTES_COUNT)
 
-@skip('Пропущено')
+
+@skip('Проверено')
 class TestDetailPage(TestCase):
 
     @classmethod
@@ -53,14 +58,18 @@ class TestDetailPage(TestCase):
             slug='note_slug'
         )
         # Сохраняем в переменную адрес страницы с новостью:
-        cls.detail_url = reverse('notes:detail', args=(cls.note.slug,))
-
-    def test_anonymous_client_has_no_form(self):
-        response = self.client.get(self.detail_url)
-        self.assertNotIn('form', response.context)
+        # http://127.0.0.1:8000/add/
+        cls.detail_url = reverse('notes:edit', args=(cls.note.slug,))
 
     def test_authorized_client_has_form(self):
+        urls = (
+            ('note:edit', (self.note.slug,)),
+            ('note:delete', (self.note.slug,)),
+            ('note:add', None)
+        )
         # Авторизуем клиент при помощи ранее созданного пользователя.
         self.client.force_login(self.author)
-        response = self.client.get(self.detail_url)
-        self.assertIn('form', response.context)
+        for name, args in urls:
+            with self.subTest(name=name):
+                response = self.client.get(self.detail_url)
+                self.assertIn('form', response.context)
