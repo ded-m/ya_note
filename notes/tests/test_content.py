@@ -1,5 +1,5 @@
 from django.test import TestCase
-from unittest import skip
+# from unittest import skip
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
@@ -8,9 +8,9 @@ from notes.models import Note
 User = get_user_model()
 
 
-@skip('Проверено')
+# @skip('Проверено')
 class TestNotesPage(TestCase):
-    # Вынесем ссылку на страницу заметок 
+    # Вынесем ссылку на страницу заметок
     # и количество заметок в атрибуты класса.
     NOTES_URL = reverse('notes:list')
     NOTES_COUNT = 11
@@ -45,7 +45,7 @@ class TestNotesPage(TestCase):
         self.assertEqual(notes_count, self.NOTES_COUNT)
 
 
-@skip('Проверено')
+# @skip('Проверено')
 class TestDetailPage(TestCase):
 
     @classmethod
@@ -57,19 +57,19 @@ class TestDetailPage(TestCase):
             author=cls.author,
             slug='note_slug'
         )
-        # Сохраняем в переменную адрес страницы с новостью:
-        # http://127.0.0.1:8000/add/
-        cls.detail_url = reverse('notes:edit', args=(cls.note.slug,))
+        # Сохраняем в переменную адрес страницы с заметкой:
+        # cls.detail_url = reverse('notes:edit', args=(cls.note.slug,))
 
     def test_authorized_client_has_form(self):
         urls = (
-            ('note:edit', (self.note.slug,)),
-            ('note:delete', (self.note.slug,)),
-            ('note:add', None)
+            ('notes:edit', (self.note.slug,)),
+            # ('notes:delete', (self.note.slug,)),
+            ('notes:add', None)
         )
         # Авторизуем клиент при помощи ранее созданного пользователя.
         self.client.force_login(self.author)
         for name, args in urls:
             with self.subTest(name=name):
-                response = self.client.get(self.detail_url)
+                url = reverse(name, args=args)
+                response = self.client.get(url)
                 self.assertIn('form', response.context)

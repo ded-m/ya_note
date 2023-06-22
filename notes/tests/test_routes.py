@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from unittest import skip
+# from unittest import skip
 from django.urls import reverse
 from notes.models import Note
 
@@ -9,7 +9,7 @@ from notes.models import Note
 User = get_user_model()
 
 
-@skip('Проверено')
+# @skip('Проверено')
 class TestRoutes(TestCase):
 
     @classmethod
@@ -51,9 +51,10 @@ class TestRoutes(TestCase):
             with self.subTest(name=name):
                 # Получаем адрес страницы:
                 url = reverse(name, args=args)
-                # Получаем ожидаемый адрес страницы логина, 
+                # Получаем ожидаемый адрес страницы логина,
                 # на который будет перенаправлен пользователь.
-                # Учитываем, что в адресе будет параметр next, в котором передаётся
+                # Учитываем, что в адресе будет параметр next,
+                # в котором передаётся
                 # адрес страницы, с которой пользователь был переадресован.
                 redirect_url = f'{login_url}?next={url}'
                 response = self.client.get(url)
