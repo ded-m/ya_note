@@ -23,6 +23,7 @@ class TestRoutes(TestCase):
                                        author=cls.author)
 
     def test_pages_availability(self):
+        """Страницы доступны незарегистрированному пользователю"""
         urls = (
             ('notes:home', None),
             ('users:login', None),
@@ -37,6 +38,7 @@ class TestRoutes(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_redirect_for_anonymous_client(self):
+        """Страницы не доступны незарегистрированному пользователю"""
         # Сохраняем адрес страницы логина:
         login_url = reverse('users:login')
         # В цикле перебираем имена страниц, с которых ожидаем редирект:
@@ -62,6 +64,7 @@ class TestRoutes(TestCase):
                 self.assertRedirects(response, redirect_url)
 
     def test_pages_availability_for_authorized_user(self):
+        """Страницы доступны зарегистрированному пользователю"""
         urls = (
             ('notes:add', None),
             ('notes:detail', (self.note.slug,)),
